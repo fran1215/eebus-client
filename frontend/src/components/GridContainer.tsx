@@ -64,9 +64,8 @@ export default function GridContainer({ simulationRunning = false, localSki = ''
             ? { 
                 ...device, 
                 power: `${(power / 1000).toFixed(2)} kW`,
-                flow: `${current.toFixed(2)} A`,
-                energy: `${(energy / 1000).toFixed(2)}`,
-                current: `${current.toFixed(2)}`,
+                energy: `${(energy / 1000).toFixed(2)} kWh`,
+                current: `${current.toFixed(2)} A`,
                 voltage: `${voltage.toFixed(2)} V`,
                 frequency: `${frequency.toFixed(2)} Hz`
               }
@@ -80,9 +79,8 @@ export default function GridContainer({ simulationRunning = false, localSki = ''
           ? {
               ...prevSelected,
               power: `${(power / 1000).toFixed(2)} kW`,
-              flow: `${current.toFixed(2)} A`,
-              energy: `${(energy / 1000).toFixed(2)}`,
-              current: `${current.toFixed(2)}`,
+              energy: `${(energy / 1000).toFixed(2)} kWh`,
+              current: `${current.toFixed(2)} A`,
               voltage: `${voltage.toFixed(2)} V`, 
               frequency: `${data.frequency.toFixed(2)} Hz`
             }
@@ -90,6 +88,39 @@ export default function GridContainer({ simulationRunning = false, localSki = ''
       );
       
       console.log(`MPC Update: ${ski} - ${power}W, ${energy}Wh, ${voltage}V, ${current}A, ${frequency}Hz`);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  // Listen for LPC updates from WebSocket
+  useEffect(() => {
+    const unsubscribe = wsService.onMessage('lpc_update', (data: any) => {
+      const { ski, consumption_nominal_max } = data;
+      
+      // Update the device with matching SKI
+      setDevices(prevDevices => 
+        prevDevices.map(device => 
+          device.id === ski 
+            ? { 
+                ...device, 
+                consumptionNominalMax: `${(consumption_nominal_max / 1000).toFixed(2)} kW`
+              }
+            : device
+        )
+      );
+
+      // Update selected device if it matches
+      setSelectedDevice(prevSelected => 
+        prevSelected && prevSelected.id === ski
+          ? {
+              ...prevSelected,
+              consumptionNominalMax: `${(consumption_nominal_max / 1000).toFixed(2)} kW`
+            }
+          : prevSelected
+      );
+      
+      console.log(`LPC Update: ${ski} - Consumption Nominal Max: ${consumption_nominal_max} W`);
     });
 
     return unsubscribe;

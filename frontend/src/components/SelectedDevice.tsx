@@ -3,7 +3,6 @@ interface Device {
   name: string;
   icon: string;
   power?: string;
-  flow?: string;
   borderColor: string;
   iconColor: string;
   position: string;
@@ -11,6 +10,8 @@ interface Device {
   current?: string;
   voltage?: string;
   frequency?: string;
+  powerLimit?: string;
+  powerLimitContractual?: boolean;
 }
 
 interface SelectedDeviceProps {
@@ -59,16 +60,21 @@ export default function SelectedDevice({ device, simulationRunning }: SelectedDe
             </p>
             <div className="flex items-baseline gap-2">
               <span className="text-4xl digital-readout font-bold text-white">
-                {simulationRunning ? (device.power || device.flow || '0.00') : '0.00'}
+                {simulationRunning ? device.power : '0.00'}
               </span>
               <span className="text-primary font-bold text-xs">kW</span>
             </div>
-            <div className="mt-4 flex items-center gap-2 text-[10px] text-slate-400">
-              <span className="material-symbols-outlined text-xs text-green-500">
-                {device.flow ? 'arrow_downward' : 'arrow_upward'}
-              </span>
-              <span>{simulationRunning ? (device.flow ? 'Charging' : 'Active') : 'Inactive'}</span>
+            {device.powerLimit && (
+              <div>
+              <div className="mt-4 h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                <div className="bg-white h-full w-[84%]"></div>
+              </div>
+              <div className="mt-4 flex items-center gap-1.5">
+                <span className="size-1.5 rounded-full bg-green-500"></span>
+                <span className="text-[9px] text-slate-400 font-bold uppercase">{device.powerLimitContractual ? "Contractual" : "Nominal"}</span>
+              </div>
             </div>
+            )}
           </div>
           <div className="glass-card p-6 rounded-2xl border-t-2 border-t-blue-400/50">
             <p className="text-[10px] text-slate-500 font-black uppercase mb-4 tracking-widest">
@@ -76,12 +82,9 @@ export default function SelectedDevice({ device, simulationRunning }: SelectedDe
             </p>
             <div className="flex items-baseline gap-2">
               <span className="text-4xl digital-readout font-bold text-white">
-                {simulationRunning ? (device.energy || '0.00') : '0.00'}
+                {simulationRunning ? device.energy : '0.00'}
               </span>
               <span className="text-blue-400 font-bold text-xs">kWh</span>
-            </div>
-            <div className="mt-4 h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-              <div className="bg-blue-400 h-full w-[84%]"></div>
             </div>
           </div>
           <div className="glass-card p-6 rounded-2xl border-t-2 border-t-amber-400/50">
@@ -90,7 +93,7 @@ export default function SelectedDevice({ device, simulationRunning }: SelectedDe
             </p>
             <div className="flex items-baseline gap-2">
               <span className="text-4xl digital-readout font-bold text-white">
-                {simulationRunning ? (device.current || '0.00') : '0.00'}
+                {simulationRunning ? device.current : '0.00'}
                 </span>
               <span className="text-amber-400 font-bold text-xs">A</span>
             </div>
@@ -104,13 +107,9 @@ export default function SelectedDevice({ device, simulationRunning }: SelectedDe
             </p>
             <div className="flex items-baseline gap-2">
               <span className="text-4xl digital-readout font-bold text-white">
-                {simulationRunning ? (device.voltage || '0.00') : '0.00'}
+                {simulationRunning ? device.voltage : '0.00'}
                 </span>
               <span className="text-purple-400 font-bold text-xs">V</span>
-            </div>
-            <div className="mt-4 flex items-center gap-1.5">
-              <span className="size-1.5 rounded-full bg-green-500"></span>
-              <span className="text-[9px] text-slate-400 font-bold uppercase">Nominal</span>
             </div>
           </div>
           <div className="glass-card p-6 rounded-2xl border-t-2 border-t-teal-400/50">
@@ -119,7 +118,7 @@ export default function SelectedDevice({ device, simulationRunning }: SelectedDe
             </p>
             <div className="flex items-baseline gap-2">
               <span className="text-4xl digital-readout font-bold text-white">
-                {simulationRunning ? (device.frequency || '0.00') : '0.00'}
+                {simulationRunning ? device.frequency : '0.00'}
                 </span>
               <span className="text-teal-400 font-bold text-xs">Hz</span>
             </div>
